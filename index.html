@@ -10,8 +10,12 @@
         <!-- бар -->
         <div id="titlebar">
             <div class="titlebar-left">
-                <div class="titlebar-tab active" data-view="player" onclick="switchView('player')">🎵 Плеер</div>
-                <div class="titlebar-tab" data-view="playlist" onclick="switchView('playlist')">📋 Плейлист</div>
+                <div class="titlebar-brand">
+                    <img src="images/icon.png" alt="SkyKwid" class="brand-icon">
+                    <span class="brand-name">SkyKwid</span>
+                </div>
+                <div class="titlebar-tab active" data-view="player" data-icon="🎵" onclick="switchView('player')">🎵 Плеер</div>
+                <div class="titlebar-tab" data-view="playlist" data-icon="📋" onclick="switchView('playlist')">📋 Плейлист</div>
             </div>
             <div class="titlebar-right">
                 <div class="window-btn" onclick="windowMinimize()">─</div>
@@ -23,7 +27,6 @@
         <!-- плеер -->
         <div class="player-content">
             <div class="player">
-                <h1>🎵 SkyKwid</h1>
                 <div class="title" id="songTitle">Нет трека</div>
                 <div class="artist" id="artistName">—</div>
                 <div class="progress-container" id="progressContainer"><div class="progress" id="progress"></div></div>
