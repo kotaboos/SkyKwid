@@ -139,20 +139,43 @@
 
         // переключение вкладок
         function switchView(view) {
-        document.querySelectorAll('.titlebar-tab').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        const activeTab = document.querySelector(`.titlebar-tab[data-view="${view}"]`);
-        if (activeTab) activeTab.classList.add('active');
+            document.querySelectorAll('.titlebar-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            const activeTab = document.querySelector(`.titlebar-tab[data-view="${view}"]`);
+            if (activeTab) activeTab.classList.add('active');
 
-        if (view === 'player') {
-            document.querySelector('.player-content').style.display = 'block';
-            document.querySelector('.playlist-content').style.display = 'none';
-        } else if (view === 'playlist') {
-            document.querySelector('.player-content').style.display = 'none';
-            document.querySelector('.playlist-content').style.display = 'block';
+            const playerContent = document.querySelector('.player-content');
+            const playlistContent = document.querySelector('.playlist-content');
+
+            if (view === 'player') {
+                // показываем плеер
+                playerContent.style.display = 'flex';
+                playlistContent.style.display = 'none';
+
+                // убираем и возвращаем класс
+                const player = document.querySelector('.player');
+                if (player) {
+                    player.classList.remove('player');
+                    void player.offsetHeight;
+                    player.classList.add('player');
+                }
+
+                // доп пересчёт через 100 мс
+                setTimeout(() => {
+                    if (playerContent) {
+                        playerContent.style.display = 'none';
+                        void playerContent.offsetHeight;
+                        playerContent.style.display = 'flex';
+                    }
+                }, 100);
+
+            } else if (view === 'playlist') {
+                playerContent.style.display = 'none';
+                playlistContent.style.display = 'flex';
+            }
         }
-        }
+
         function windowMinimize() {
             const { ipcRenderer } = require('electron');
             ipcRenderer.send('window-minimize');
@@ -165,6 +188,16 @@
             const { ipcRenderer } = require('electron');
             ipcRenderer.send('window-close');
         }
+
+        window.addEventListener('resize', () => {
+            const player = document.querySelector('.player');
+            if (player && document.querySelector('.player-content').style.display !== 'none') {
+                player.style.transform = 'scale(0.99)';
+                requestAnimationFrame(() => {
+                    player.style.transform = 'scale(1)';
+                });
+            }
+        });
     </script>
 </body>
 </html>

@@ -21,6 +21,10 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 10px;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .playlist-content {
@@ -29,6 +33,10 @@ html, body {
     align-items: center;
     justify-content: center;
     padding: 10px;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 /* ===== КАСТОМНЫЙ ВЕРХНИЙ БАР ===== */
@@ -108,7 +116,9 @@ html, body {
     text-align: center;
     width: 100%;
     max-width: 420px;
+    min-width: 280px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-sizing: border-box;
 }
 
 button {
