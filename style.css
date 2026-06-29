@@ -3,73 +3,77 @@ html, body {
     padding: 0;
     height: 100%;
     overflow: hidden;
-    background: #1a1a2e;
-    font-family: Arial, sans-serif;
+    font-family: 'Segoe UI', Arial, sans-serif;
     color: white;
+}
+
+body {
+    background: url('images/background.jpg') no-repeat center center fixed;
+    background-size: cover;
 }
 
 #app {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: #1a1a2e;
+    background: rgba(0, 0, 0, 0.25); /* лёгкая затемнёнка  */
 }
 
-.player-content {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    min-height: 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-.playlist-content {
-    flex: 1;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    padding: 10px;
-    min-height: 0;
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-}
-
-/* ===== КАСТОМНЫЙ ВЕРХНИЙ БАР ===== */
+/* верхний бар */
 #titlebar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 38px;
-    background: #0d0d1a;
+    height: 42px;
+    background: rgba(13, 13, 26, 0.7);
+    backdrop-filter: blur(8px);
     padding: 0 12px;
     -webkit-app-region: drag;
     user-select: none;
-    border-bottom: 1px solid #2a2a4a;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
     flex-shrink: 0;
 }
 
 .titlebar-left {
     display: flex;
+    align-items: center;
+    gap: 6px;
+    -webkit-app-region: no-drag; 
+}
+
+.titlebar-brand {
+    display: flex;
+    align-items: center;
     gap: 8px;
-    -webkit-app-region: no-drag;
+    margin-right: 12px;
+}
+
+.brand-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+}
+
+.brand-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: #eee;
+    letter-spacing: 0.5px;
 }
 
 .titlebar-tab {
-    padding: 6px 16px;
+    padding: 6px 14px;
     border-radius: 8px;
     font-size: 14px;
     color: #aaa;
     cursor: pointer;
     transition: 0.2s;
+    white-space: nowrap;
+    -webkit-app-region: no-drag;
 }
 
 .titlebar-tab:hover {
-    background: #2a2a4a;
+    background: rgba(255, 255, 255, 0.08);
     color: white;
 }
 
@@ -81,7 +85,7 @@ html, body {
 
 .titlebar-right {
     display: flex;
-    gap: 8px;
+    gap: 6px;
     -webkit-app-region: no-drag;
 }
 
@@ -99,7 +103,7 @@ html, body {
 }
 
 .window-btn:hover {
-    background: #2a2a4a;
+    background: rgba(255, 255, 255, 0.1);
     color: white;
 }
 
@@ -108,76 +112,59 @@ html, body {
     color: white;
 }
 
-/* ===== ПЛЕЕР ===== */
+.player-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+.playlist-content {
+    flex: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+}
+
+/* плеер */
 .player {
-    background: #16213e;
-    padding: 30px 40px;
-    border-radius: 20px;
+    background: rgba(22, 33, 62, 0.65);
+    backdrop-filter: blur(16px);
+    padding: 28px 32px;
+    border-radius: 24px;
     text-align: center;
     width: 100%;
     max-width: 420px;
-    min-width: 280px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
     box-sizing: border-box;
 }
 
-button {
-    background: #e94560;
-    border: none;
-    color: white;
-    font-size: 24px;
-    padding: 15px 40px;
-    border-radius: 50px;
-    cursor: pointer;
-    transition: 0.3s;
-    margin: 5px;
-}
-
-button:hover {
-    background: #c73a54;
-    transform: scale(1.05);
-}
-
 .title {
-    font-size: 18px;
-    margin: 10px 0;
-    color: #eee;
+    font-size: 20px;
+    font-weight: 600;
+    margin: 6px 0 2px;
+    color: #fff;
 }
 
 .artist {
-    font-size: 14px;
-    color: #aaa;
-    margin-bottom: 15px;
-}
-
-.controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.controls button {
-    font-size: 18px;
-    padding: 10px 20px;
-}
-
-.status {
-    font-size: 13px;
-    color: #888;
-    margin-top: 15px;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 12px;
 }
 
 .progress-container {
-    background: #2a2a4a;
+    background: rgba(255, 255, 255, 0.12);
     border-radius: 50px;
     height: 6px;
-    margin: 15px 0;
+    margin: 12px 0 4px;
     cursor: pointer;
 }
 
 .progress {
-    background: #e94560;
+    background: linear-gradient(90deg, #e94560, #ff6b8a);
     border-radius: 50px;
     height: 100%;
     width: 0%;
@@ -188,16 +175,53 @@ button:hover {
     display: flex;
     justify-content: space-between;
     font-size: 12px;
-    color: #888;
-    margin-top: 5px;
+    color: rgba(255, 255, 255, 0.4);
+    margin-top: 4px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin: 14px 0 10px;
+}
+
+.controls button {
+    background: rgba(255, 255, 255, 0.06);
+    border: none;
+    color: white;
+    font-size: 22px;
+    padding: 10px 18px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.controls button:hover {
+    background: rgba(255, 255, 255, 0.12);
+    transform: scale(1.04);
+}
+
+.controls #playBtn {
+    background: #e94560;
+    font-size: 26px;
+    padding: 10px 28px;
+    border: none;
+    box-shadow: 0 4px 20px rgba(233, 69, 96, 0.3);
+}
+
+.controls #playBtn:hover {
+    background: #ff6b8a;
+    transform: scale(1.05);
 }
 
 .volume {
-    margin-top: 15px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
+    margin: 8px 0 12px;
 }
 
 .volume input {
@@ -205,7 +229,7 @@ button:hover {
     -webkit-appearance: none;
     width: 100px;
     height: 4px;
-    background: #2a2a4a;
+    background: rgba(255, 255, 255, 0.2);
     border-radius: 50px;
     outline: none;
 }
@@ -220,29 +244,53 @@ button:hover {
 }
 
 .playlist {
-    margin-top: 15px;
+    margin-top: 10px;
     text-align: left;
-    max-height: 150px;
+    max-height: 120px;
     overflow-y: auto;
-    border-top: 1px solid #2a2a4a;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
     padding-top: 10px;
 }
 
 .playlist-item {
-    padding: 6px 10px;
+    padding: 5px 10px;
     cursor: pointer;
     border-radius: 8px;
-    font-size: 14px;
+    font-size: 13px;
     transition: 0.2s;
-    color: #ccc;
+    color: rgba(255, 255, 255, 0.7);
 }
 
 .playlist-item:hover {
-    background: #2a2a4a;
+    background: rgba(255, 255, 255, 0.06);
     color: white;
 }
 
 .playlist-item.active {
-    background: #e94560;
+    background: rgba(233, 69, 96, 0.3);
     color: white;
+}
+
+.status {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.35);
+    margin-top: 10px;
+}
+
+/* адаптивность бара */
+@media (max-width: 480px) {
+    .titlebar-tab {
+        font-size: 0;
+        padding: 6px 10px;
+    }
+    .titlebar-tab::before {
+        font-size: 18px;
+        content: attr(data-icon);
+    }
+    .brand-name {
+        font-size: 13px;
+    }
+    .player {
+        padding: 20px 16px;
+    }
 }
