@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>SkyKwid</title>
+    <style>
+        body { background: #1a1a2e; color: white; font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .player { background: #16213e; padding: 40px; border-radius: 20px; text-align: center; width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        button { background: #e94560; border: none; color: white; font-size: 24px; padding: 15px 40px; border-radius: 50px; cursor: pointer; transition: 0.3s; margin: 5px; }
+        button:hover { background: #c73a54; transform: scale(1.05); }
+        .title { font-size: 18px; margin: 10px 0; color: #eee; }
+        .artist { font-size: 14px; color: #aaa; margin-bottom: 15px; }
+        .controls { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; }
+        .controls button { font-size: 18px; padding: 10px 20px; }
+        .status { font-size: 13px; color: #888; margin-top: 15px; }
+        .progress-container { background: #2a2a4a; border-radius: 50px; height: 6px; margin: 15px 0; cursor: pointer; }
+        .progress { background: #e94560; border-radius: 50px; height: 100%; width: 0%; transition: width 0.1s linear; }
+        .time { display: flex; justify-content: space-between; font-size: 12px; color: #888; margin-top: 5px; }
+        .volume { margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .volume input { appearance: none; -webkit-appearance: none; width: 100px; height: 4px; background: #2a2a4a; border-radius: 50px; outline: none; }
+        .volume input::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; background: #e94560; border-radius: 50%; cursor: pointer; }
+        .playlist { margin-top: 15px; text-align: left; max-height: 150px; overflow-y: auto; border-top: 1px solid #2a2a4a; padding-top: 10px; }
+        .playlist-item { padding: 6px 10px; cursor: pointer; border-radius: 8px; font-size: 14px; transition: 0.2s; color: #ccc; }
+        .playlist-item:hover { background: #2a2a4a; color: white; }
+        .playlist-item.active { background: #e94560; color: white; }
+    </style>
+</head>
+<body>
+    <div class="player">
+        <h1>🎵 SkyKwid</h1>
+        <div class="title" id="songTitle">Нет трека</div>
+        <div class="artist" id="artistName">—</div>
+        <div class="progress-container" id="progressContainer"><div class="progress" id="progress"></div></div>
+        <div class="time"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
+        <div class="controls">
+            <button id="prevBtn">⏮</button>
+            <button id="playBtn">▶</button>
+            <button id="nextBtn">⏭</button>
+        </div>
+        <div class="volume"><span>🔊</span><input type="range" id="volumeSlider" min="0" max="100" value="80"></div>
+        <div class="playlist" id="playlistContainer"></div>
+        <div class="status" id="status">Загрузка...</div>
+    </div>
+    <script>
+        const { ipcRenderer } = require('electron');
+        let playlist = [], currentIndex = 0, isPlaying = false;
+        const audio = new Audio();
+
+        ipcRenderer.invoke('get-songs').then(songs => {
+            playlist = songs;
+            if (playlist.length > 0) {
+                renderPlaylist();
+                loadTrack(0);
+                statusEl.textContent = 'Готов к воспроизведению';
+            } else {
+                statusEl.textContent = '❌ Нет MP3 в папке music';
+            }
+        });
+
+        const playBtn = document.getElementById('playBtn');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const progress = document.getElementById('progress');
+        const progressContainer = document.getElementById('progressContainer');
+        const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
+        const volumeSlider = document.getElementById('volumeSlider');
+        const songTitleEl = document.getElementById('songTitle');
+        const artistNameEl = document.getElementById('artistName');
+        const statusEl = document.getElementById('status');
+        const playlistContainer = document.getElementById('playlistContainer');
+
+        function loadTrack(index) {
+            const track = playlist[index];
+            if (!track) return;
+            audio.src = track.file;
+            songTitleEl.textContent = track.title;
+            artistNameEl.textContent = track.artist;
+            progress.style.width = '0%';
+            currentTimeEl.textContent = '0:00';
+            totalTimeEl.textContent = '0:00';
+            renderPlaylist();
+        }
+
+        function togglePlay() {
+            if (playlist.length === 0) return;
+            if (audio.src === '') loadTrack(currentIndex);
+            if (isPlaying) {
+                audio.pause();
+                playBtn.textContent = '▶';
+                statusEl.textContent = '⏸ На паузе';
+            } else {
+                audio.play().catch(() => statusEl.textContent = '❌ Ошибка файла');
+                playBtn.textContent = '⏸';
+                statusEl.textContent = '▶ ' + playlist[currentIndex].title;
+            }
+            isPlaying = !isPlaying;
+        }
+
+        function prevTrack() { if (playlist.length === 0) return; currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadTrack(currentIndex); if (isPlaying) audio.play(); }
+        function nextTrack() { if (playlist.length === 0) return; currentIndex = (currentIndex + 1) % playlist.length; loadTrack(currentIndex); if (isPlaying) audio.play(); }
+
+        function renderPlaylist() {
+            playlistContainer.innerHTML = '';
+            playlist.forEach((track, index) => {
+                const div = document.createElement('div');
+                div.className = 'playlist-item' + (index === currentIndex ? ' active' : '');
+                div.textContent = track.title + ' — ' + track.artist;
+                div.onclick = () => { currentIndex = index; loadTrack(currentIndex); if (isPlaying) audio.play(); };
+                playlistContainer.appendChild(div);
+            });
+        }
+
+        audio.addEventListener('timeupdate', () => {
+            if (audio.duration) {
+                progress.style.width = (audio.currentTime / audio.duration * 100) + '%';
+                let m = Math.floor(audio.currentTime / 60), s = Math.floor(audio.currentTime % 60);
+                currentTimeEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
+                let tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
+                totalTimeEl.textContent = tm + ':' + (ts < 10 ? '0' : '') + ts;
+            }
+        });
+        audio.addEventListener('ended', nextTrack);
+        progressContainer.addEventListener('click', (e) => {
+            const rect = progressContainer.getBoundingClientRect();
+            const percent = (e.clientX - rect.left) / rect.width;
+            if (audio.duration) audio.currentTime = percent * audio.duration;
+        });
+        volumeSlider.addEventListener('input', () => audio.volume = volumeSlider.value / 100);
+
+        playBtn.addEventListener('click', togglePlay);
+        prevBtn.addEventListener('click', prevTrack);
+        nextBtn.addEventListener('click', nextTrack);
+        document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); togglePlay(); } });
+    </script>
+</body>
+</html>
