@@ -1,0 +1,248 @@
+html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    background: #1a1a2e;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+#app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: #1a1a2e;
+}
+
+.player-content {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+.playlist-content {
+    flex: 1;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    min-height: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+/* ===== КАСТОМНЫЙ ВЕРХНИЙ БАР ===== */
+#titlebar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 38px;
+    background: #0d0d1a;
+    padding: 0 12px;
+    -webkit-app-region: drag;
+    user-select: none;
+    border-bottom: 1px solid #2a2a4a;
+    flex-shrink: 0;
+}
+
+.titlebar-left {
+    display: flex;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+}
+
+.titlebar-tab {
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.titlebar-tab:hover {
+    background: #2a2a4a;
+    color: white;
+}
+
+.titlebar-tab.active {
+    background: #e94560;
+    color: white;
+    font-weight: 600;
+}
+
+.titlebar-right {
+    display: flex;
+    gap: 8px;
+    -webkit-app-region: no-drag;
+}
+
+.window-btn {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #aaa;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.window-btn:hover {
+    background: #2a2a4a;
+    color: white;
+}
+
+.window-btn.close-btn:hover {
+    background: #e94560;
+    color: white;
+}
+
+/* ===== ПЛЕЕР ===== */
+.player {
+    background: #16213e;
+    padding: 30px 40px;
+    border-radius: 20px;
+    text-align: center;
+    width: 100%;
+    max-width: 420px;
+    min-width: 280px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-sizing: border-box;
+}
+
+button {
+    background: #e94560;
+    border: none;
+    color: white;
+    font-size: 24px;
+    padding: 15px 40px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin: 5px;
+}
+
+button:hover {
+    background: #c73a54;
+    transform: scale(1.05);
+}
+
+.title {
+    font-size: 18px;
+    margin: 10px 0;
+    color: #eee;
+}
+
+.artist {
+    font-size: 14px;
+    color: #aaa;
+    margin-bottom: 15px;
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.controls button {
+    font-size: 18px;
+    padding: 10px 20px;
+}
+
+.status {
+    font-size: 13px;
+    color: #888;
+    margin-top: 15px;
+}
+
+.progress-container {
+    background: #2a2a4a;
+    border-radius: 50px;
+    height: 6px;
+    margin: 15px 0;
+    cursor: pointer;
+}
+
+.progress {
+    background: #e94560;
+    border-radius: 50px;
+    height: 100%;
+    width: 0%;
+    transition: width 0.1s linear;
+}
+
+.time {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.volume {
+    margin-top: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.volume input {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 100px;
+    height: 4px;
+    background: #2a2a4a;
+    border-radius: 50px;
+    outline: none;
+}
+
+.volume input::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    background: #e94560;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.playlist {
+    margin-top: 15px;
+    text-align: left;
+    max-height: 150px;
+    overflow-y: auto;
+    border-top: 1px solid #2a2a4a;
+    padding-top: 10px;
+}
+
+.playlist-item {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 8px;
+    font-size: 14px;
+    transition: 0.2s;
+    color: #ccc;
+}
+
+.playlist-item:hover {
+    background: #2a2a4a;
+    color: white;
+}
+
+.playlist-item.active {
+    background: #e94560;
+    color: white;
+}
