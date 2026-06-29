@@ -33,6 +33,8 @@ function createWindow() {
         height: 700,
         minWidth:380,
         minHeight:550,
+        frame: false,
+        titleBarStyle: 'hidden',
         icon: path.join(__dirname, 'images', 'icon.jpg'),
         webPreferences: {
             nodeIntegration: true,
@@ -52,3 +54,14 @@ ipcMain.handle('get-songs', () => getSongs());
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') app.quit();
 });
+
+// обработчики команд из интерфейса (управление окном)
+ipcMain.on('window-minimize', () => mainWindow.minimize());
+ipcMain.on('window-maximize', () => {
+    if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+    } else {
+        mainWindow.maximize();
+    }
+});
+ipcMain.on('window-close', () => mainWindow.close());
