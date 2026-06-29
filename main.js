@@ -35,6 +35,7 @@ function createWindow() {
         minHeight:550,
         frame: false,
         titleBarStyle: 'hidden',
+        title: 'SkyKwid',
         icon: path.join(__dirname, 'images', 'icon.jpg'),
         webPreferences: {
             nodeIntegration: true,
