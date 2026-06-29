@@ -31,11 +31,15 @@ function createWindow() {
     mainWindow = new BrowserWindow({
         width: 450,
         height: 700,
+        minWidth:380,
+        minHeight:550,
+        icon: path.join(__dirname, 'images', 'icon.jpg'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     });
+    mainWindow.setMenuBarVisibility(false);
     mainWindow.loadFile('index.html');
 }
 
