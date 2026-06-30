@@ -18,6 +18,7 @@
                 <div class="titlebar-tab" data-view="playlist" data-icon="📋" onclick="switchView('playlist')">📋 Плейлист</div>
             </div>
             <div class="titlebar-right">
+                <div class="titlebar-tab" data-view="settings" data-icon="⚙️" onclick="switchView('settings')">⚙️</div>
                 <div class="window-btn" onclick="windowMinimize()">─</div>
                 <div class="window-btn" onclick="windowMaximize()">☐</div>
                 <div class="window-btn close-btn" onclick="windowClose()">✕</div>
@@ -46,6 +47,34 @@
         <div class="playlist-content" style="display: none;">
             <h2 style="color: white; padding: 20px; text-align: center;">Тут будет большой список песен</h2>
         </div>
+
+        <!-- настройки -->
+         <div class="content-page" id="settingsView" style="display: none;">
+            <div class="player" style="max-width: 500px; width: 90%; text-align: left;">
+                <h2 style="color: #eee; margin-bottom: 25px; text-align: center; font-weight: 400; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 15px;">⚙️ Настройки</h2>
+                
+                <!-- тема -->
+                <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 16px; border-radius: 12px;">
+                    <label style="color: #ccc; font-size: 15px; cursor: pointer;">🎨 Тема</label>
+                    <select id="themeSelect" style="padding: 6px 12px; border-radius: 8px; background: #1a1a2e; color: white; border: 1px solid #2a2a4a; font-size: 14px; cursor: pointer; outline: none;">
+                        <option value="dark">Тёмная</option>
+                        <option value="light">Светлая</option>
+                        <option value="glass">Стеклянная</option>
+                    </select>
+                </div>
+                
+                <!-- автовоспроизведение -->
+                <div style="margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 16px; border-radius: 12px;">
+                    <label style="color: #aaa; display: block; margin-bottom: 5px;">▶️ Автовоспроизведение при запуске</label>
+                    <label class="switch">
+                        <input type="checkbox" id="autoPlayCheck" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button onclick="saveSettings()" style="background: #e94560; border: none; color: white; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: 0.2s; letter-spacing: 0.5px;">Сохранить настройки</button>
+                <div id="settingsStatus" style="margin-top: 12px; color: #888; text-align: center; font-size: 13px;"></div>
+            </div>
     </div>
     
     <script>
@@ -151,6 +180,8 @@
             const playerContent = document.querySelector('.player-content');
             const playlistContent = document.querySelector('.playlist-content');
 
+            document.querySelectorAll('.content-page').forEach(page => page.style.display = 'none');
+
             if (view === 'player') {
                 // показываем плеер
                 playerContent.style.display = 'flex';
@@ -176,6 +207,11 @@
             } else if (view === 'playlist') {
                 playerContent.style.display = 'none';
                 playlistContent.style.display = 'flex';
+            } else if (view === 'settings') {
+                playerContent.style.display = 'none';
+                playlistContent.style.display = 'none';
+                document.getElementById('settingsView').style.display = 'flex';
+                loadSettings();
             }
         }
 
