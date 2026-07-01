@@ -46,24 +46,24 @@
 
         <!-- плейлист -->
         <div class="playlist-content" style="display: none;">
-            <div class="player" style="max-width: 600px; width: 90%;">
-                <div id="playlistsList" style="text-align: left; color: #ccc; max-height: 400px; overflow-y: auto;">
-                    <p style="color: #ffffff; text-align: center;">Пока нет плейлистов. Создайте первый!</p>
+            <div class="playlist-card" >
+                <div class="playlist-list" id="playlistsList">
+                    <p class="empty-playlist">Пока нет плейлистов. Создайте первый!</p>
                 </div>
-                <button onclick="createPlaylist()" style="background: #e94560; border: none; color: white; padding: 10px 20px; border-radius: 10px; margin-top: 15px; cursor: pointer; width: 100%;">➕ Создать плейлист из папки</button>
-                <button onclick="addFilesToPlaylist()" style="background: #2a2a4a; border: none; color: white; padding: 10px 20px; border-radius: 10px; margin-top: 10px; cursor: pointer; width: 100%;">➕ Добавить файлы в плейлист</button>
+                <button class="btn-primary btn-full" onclick="createPlaylist()">Создать плейлист из папки</button>
+                <button class="btn-secondary btn-full" onclick="addFilesToPlaylist()">Добавить файлы в плейлист</button>
             </div>
         </div>
 
         <!-- настройки -->
          <div class="content-page" id="settingsView" style="display: none;">
-            <div class="player" style="max-width: 500px; width: 90%; text-align: left;">
-                <h2 style="color: #eee; margin-bottom: 25px; text-align: center; font-weight: 400; letter-spacing: 1px; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 15px;">⚙️ Настройки</h2>
+            <div class="setting-card">
+                <h2 class="setting-title">⚙️ Настройки</h2>
                 
                 <!-- тема -->
-                <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 16px; border-radius: 12px;">
-                    <label style="color: #ccc; font-size: 15px; cursor: pointer;">🎨 Тема</label>
-                    <select id="themeSelect" style="padding: 6px 12px; border-radius: 8px; background: #1a1a2e; color: white; border: 1px solid #2a2a4a; font-size: 14px; cursor: pointer; outline: none;">
+                <div class="setting-row">
+                    <label class="setting-label">🎨 Тема</label>
+                    <select class="setting-select" id="themeSelect">
                         <option value="dark">Тёмная</option>
                         <option value="light">Светлая</option>
                         <option value="glass">Стеклянная</option>
@@ -71,27 +71,41 @@
                 </div>
                 
                 <!-- автовоспроизведение -->
-                <div style="margin-bottom: 25px; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 12px 16px; border-radius: 12px;">
-                    <label style="color: #aaa; display: block; margin-bottom: 5px;">▶️ Автовоспроизведение при запуске</label>
+                <div class="setting-row">
+                    <label class="setting-label">▶️ Автовоспроизведение при запуске</label>
                     <label class="switch">
                         <input type="checkbox" id="autoPlayCheck" checked>
                         <span class="slider"></span>
                     </label>
                 </div>
 
-                <button onclick="saveSettings()" style="background: #e94560; border: none; color: white; padding: 12px; border-radius: 12px; cursor: pointer; width: 100%; font-size: 16px; font-weight: 600; transition: 0.2s; letter-spacing: 0.5px;">Сохранить настройки</button>
-                <div id="settingsStatus" style="margin-top: 12px; color: #888; text-align: center; font-size: 13px;"></div>
+                <button class="btn-primary btn-full" onclick="saveSettings()">Сохранить настройки</button>
+                <div class="settings-status" id="settingsStatus"></div>
             </div>
     </div>
     <script src="renderer.js"></script>
     <!-- модальное окно для ввода названия -->
-    <div id="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(6px); justify-content: center; align-items: center; z-index: 9999;">
-        <div style="background: #1a1a2e; padding: 30px; border-radius: 20px; max-width: 400px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.06);">
-            <h3 style="color: #eee; margin-bottom: 16px; text-align: center;">Введите название плейлиста</h3>
-            <input type="text" id="modalInput" placeholder="Название..." style="width: 100%; padding: 12px; border-radius: 12px; background: #0d0d1a; color: white; border: 1px solid #2a2a4a; outline: none; font-size: 15px; box-sizing: border-box;">
-            <div style="display: flex; gap: 12px; margin-top: 20px; justify-content: flex-end;">
-                <button onclick="closeModal()" style="background: #2a2a4a; border: none; color: #ccc; padding: 10px 24px; border-radius: 12px; cursor: pointer;">Отмена</button>
-                <button id="modalConfirmBtn" style="background: #e94560; border: none; color: white; padding: 10px 24px; border-radius: 12px; cursor: pointer;">Создать</button>
+    <div class="modal-overlay" id="modal" style="display: none;">
+        <div class="modal-box">
+            <h3 class="modal-title">Введите название плейлиста</h3>
+            <input class="modal-input" type="text" id="modalInput" placeholder="Название...">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal()">Отмена</button>
+                <button class="btn-confirm" id="modalConfirmBtn">Создать</button>
+            </div>
+        </div>
+    </div>
+    <!-- модалка для уведомлений -->
+    <div class="toast" id="toast" style="display: none;">
+        <span id="toastMessage"></span>
+    </div>
+    <!-- модалка для подтверждения -->
+    <div class="modal-overlay" id="confirmModal" style="display: none;">
+        <div class="modal-box">
+            <p class="modal-confirm-text" id="confirmMessage">Вы уверены?</p>
+            <div class="modal-actions" style="justify-content: center;">
+                <button class="btn-cancel" onclick="confirmResponse(false)" >Отмена</button>
+                <button class="btn-danger" onclick="confirmResponse(true)" >Удалить</button>
             </div>
         </div>
     </div>

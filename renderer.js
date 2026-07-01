@@ -93,15 +93,12 @@ document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preven
 let playlists = [];
 
 async function createPlaylist() {
-    console.log('🟢 createPlaylist вызвана');
     const folderPath = await ipcRenderer.invoke('select-folder-dialog');
-    console.log('📁 Выбрана папка:', folderPath);
     if (!folderPath) return;
 
     const songs = await ipcRenderer.invoke('scan-folder', folderPath);
-    console.log('🎵 Найдено песен:', songs.length);
     if (songs.length === 0) {
-        alert('В выбранной папке нет музыки!');
+        showToast('В выбранной папке нет музыки!');
         return;
     }
 
@@ -117,14 +114,21 @@ async function createPlaylist() {
     playlists.push(playlistData);
     await ipcRenderer.invoke('save-playlists', playlists);
     renderPlaylistsList();
-    alert('Плейлист ' + name + ' создан!');
+    showToast('Плейлист ' + name + ' создан!');
 }
 
 async function deletePlaylist(id) {
-    if (!confirm('Удалить этот плейлист?')) return;
+    const pl = playlists.find(p => p.id === id);
+    if (!pl) return;
+
+    const confirmed = await showConfirm('Удалить плейлист "' + pl.name + '"?');
+    if (!confirmed) return;
+
     playlists = playlists.filter(p => p.id !== id);
     await ipcRenderer.invoke('save-playlists', playlists);
     renderPlaylistsList();
+    showToast('🗑 Плейлист "' + pl.name + '" удалён');
+
     if (playlists.length === 0) {
         playlist = [];
         renderPlaylist();
@@ -141,6 +145,9 @@ function loadPlaylistById(id) {
         loadTrack(0);
         statusEl.textContent = '🎵 Загружен плейлист: ' + pl.name;
         switchView('player');
+        setTimeout(() => {
+            togglePlay();
+        }, 200);
     }
 }
 
@@ -148,7 +155,7 @@ function renderPlaylistsList() {
     const container = document.getElementById('playlistsList');
     if (!container) return;
     if (playlists.length === 0) {
-        container.innerHTML = '<p style="color: #888;">Пока нет плейлистов. Создайте первый!</p>';
+        container.innerHTML = '<p style="color: #ffffff; text-align: center">Пока нет плейлистов. Создайте первый!</p>';
         return;
     }
     container.innerHTML = '';
@@ -336,7 +343,7 @@ loadSavedPlaylists();
 // добавить файлы в плейлист
 async function addFilesToPlaylist() {
     if (playlists.length === 0) {
-        alert('Сначала создайте плейлист!');
+        showToast('Сначала создайте плейлист!');
         return;
     }
 
@@ -349,7 +356,7 @@ async function addFilesToPlaylist() {
         if (!choice) return;
         const idx = parseInt(choice) - 1;
         if (isNaN(idx) || idx < 0 || idx >= playlists.length) {
-            alert('❌ Неверный номер!');
+            showToast('❌ Неверный номер!');
             return;
         }
         targetPlaylistId = playlists[idx].id;
@@ -375,7 +382,7 @@ async function addFilesToPlaylist() {
         target.songs = target.songs.concat(newSongs);
         await ipcRenderer.invoke('save-playlists', playlists);
         renderPlaylistsList();
-        alert('✅ Добавлено ' + newSongs.length + ' песен в плейлист "' + target.name + '"');
+        showToast('✅ Добавлено ' + newSongs.length + ' песен в плейлист "' + target.name + '"');
     }
 }
 
@@ -423,4 +430,41 @@ function showModal(placeholder = 'Введите название...') {
 function closeModal() {
     if (modalResolve) modalResolve(null);
     modalResolve = null;
+}
+
+// подтверждение
+let confirmResolve = null;
+function showConfirm(message) {
+    return new Promise((resolve) => {
+        document.getElementById('confirmMessage').textContent = message;
+        document.getElementById('confirmModal').style.display = 'flex';
+        confirmResolve = resolve;
+    });
+}
+function confirmResponse(result) {
+    document.getElementById('confirmModal').style.display = 'none';
+    if (confirmResolve) confirmResolve(result);
+    confirmResolve = null;
+}
+
+// уведомление
+let toastTimeout = null;
+function showToast(message, duration = 3000) {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    if (toastTimeout) {
+        clearTimeout(toastTimeout);
+        toast.style.opacity = '0';
+        setTimeout(() => { toast.style.display = 'none'; }, 300);
+    }
+    toastMessage.textContent = message;
+    toast.style.display = 'block';
+    toast.style.opacity = '1';
+    toastTimeout = setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => {
+            toast.style.display = 'none';
+            toastTimeout = null;
+        }, 300);
+    }, duration);
 }

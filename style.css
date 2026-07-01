@@ -1,3 +1,4 @@
+/* глобал */
 html, body {
     margin: 0;
     padding: 0;
@@ -16,7 +17,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100vh;
-    background: rgba(0, 0, 0, 0.25); /* лёгкая затемнёнка  */
+    background: rgba(0, 0, 0, 0.25);
 }
 
 /* верхний бар */
@@ -24,7 +25,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 42px;
+    height: 40px;
     background: rgba(13, 13, 26, 0.7);
     backdrop-filter: blur(8px);
     padding: 0 12px;
@@ -112,6 +113,7 @@ body {
     color: white;
 }
 
+/* контейнеры */
 .player-content {
     flex: 1;
     display: flex;
@@ -285,6 +287,267 @@ body {
     margin-top: 10px;
 }
 
+/* плейлист */
+.playlist-card {
+    background: rgba(0, 0, 0, 0.228);
+    backdrop-filter: blur(16px);
+    padding: 28px 32px;
+    border-radius: 24px;
+    text-align: center;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-sizing: border-box;
+}
+
+.playlist-list {
+    text-align: left;
+    color: #ccc;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.empty-playlist {
+    color: #ffffff;
+    text-align: center;
+}
+
+/* настройки */
+.setting-card {
+    background: rgba(0, 0, 0, 0.228);
+    backdrop-filter: blur(16px);
+    padding: 28px 32px;
+    border-radius: 24px;
+    text-align: center;
+    width: 90%;
+    max-width: 500px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    box-sizing: border-box;
+}
+
+.settings-title {
+    color: #eee;
+    margin-bottom: 25px;
+    text-align: center;
+    font-weight: 400;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding-bottom: 15px;
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.03);
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+}
+
+.settings-label {
+    color: #ccc;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.settings-select {
+    padding: 6px 12px;
+    border-radius: 8px;
+    background: #1a1a2e;
+    color: white;
+    border: 1px solid #2a2a4a;
+    font-size: 14px;
+    cursor: pointer;
+    outline: none;
+}
+
+.settings-status {
+    margin-top: 12px;
+    color: #888;
+    text-align: center;
+    font-size: 13px;
+}  
+
+/* кнопки */
+.btn-primary {
+    background: #e94560;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.btn-primary:hover {
+    background: #ff6b8a;
+    transform: scale(1.02);
+}
+
+.btn-secondary {
+    background: #2a2a4a;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.btn-secondary:hover {
+    background: #3a3a5a;
+     transform: scale(1.02);
+}
+
+.btn-full {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-cancel {
+    background: #2a2a4a;
+    border: none;
+    color: #ccc;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.btn-confirm {
+    background: #e94560;
+    border: none;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.btn-danger {
+    background: #e94560;
+    border: none;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+/* модальное окно */
+.modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+.modal-box {
+    background: #1a1a2e;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.modal-title {
+    color: #eee;
+    margin-bottom: 16px;
+    text-align: center;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: #0d0d1a;
+    color: white;
+    border: 1px solid #2a2a4a;
+    outline: none;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+.modal-input:focus {
+    border-color: #e94560;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+.modal-confirm-text {
+    color: #eee;
+    font-size: 16px;
+    margin-bottom: 20px;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    background: #2a2a4a;
+    border: none;
+    color: #ccc;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.btn-cancel:hover {
+    background: #3a3a5a;
+    color: white;
+}
+
+.btn-confirm {
+    background: #e94560;
+    border: none;
+    color: white;
+    padding: 10px 24px;
+    border-radius: 12px;
+    cursor: pointer;
+}
+
+.btn-confirm:hover {
+    background: #ff6b8a;
+}
+
+/* уведомления */
+.toast {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(22, 33, 62, 0.95);
+    backdrop-filter: blur(12px);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255,255,255,0.06);
+    z-index: 10000;
+    text-align: center;
+    max-width: 90%;
+    transition: opacity 0.3s;
+    opacity: 1;
+}
+
 /* адаптивность бара */
 @media (max-width: 480px) {
     .titlebar-tab {
@@ -301,74 +564,4 @@ body {
     .player {
         padding: 20px 16px;
     }
-}
-
-/* модальное окно */
-#modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(6px);
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-#modal > div {
-    background: #1a1a2e;
-    padding: 30px;
-    border-radius: 20px;
-    max-width: 400px;
-    width: 90%;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-}
-
-#modal input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    background: #0d0d1a;
-    color: white;
-    border: 1px solid #2a2a4a;
-    outline: none;
-    font-size: 15px;
-    box-sizing: border-box;
-}
-
-#modal input:focus {
-    border-color: #e94560;
-}
-
-#modal .modal-buttons {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-    justify-content: flex-end;
-}
-
-#modal .modal-buttons button {
-    padding: 10px 24px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
-    font-size: 14px;
-}
-
-#modal .btn-cancel {
-    background: #2a2a4a;
-    color: #ccc;
-}
-
-#modal .btn-confirm {
-    background: #e94560;
-    color: white;
-}
-
-#modal .btn-confirm:hover {
-    background: #ff6b8a;
 }
