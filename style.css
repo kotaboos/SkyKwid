@@ -303,3 +303,72 @@ body {
     }
 }
 
+/* модальное окно */
+#modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(6px);
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#modal > div {
+    background: #1a1a2e;
+    padding: 30px;
+    border-radius: 20px;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+#modal input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 12px;
+    background: #0d0d1a;
+    color: white;
+    border: 1px solid #2a2a4a;
+    outline: none;
+    font-size: 15px;
+    box-sizing: border-box;
+}
+
+#modal input:focus {
+    border-color: #e94560;
+}
+
+#modal .modal-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: flex-end;
+}
+
+#modal .modal-buttons button {
+    padding: 10px 24px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+#modal .btn-cancel {
+    background: #2a2a4a;
+    color: #ccc;
+}
+
+#modal .btn-confirm {
+    background: #e94560;
+    color: white;
+}
+
+#modal .btn-confirm:hover {
+    background: #ff6b8a;
+}
