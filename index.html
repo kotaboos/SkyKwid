@@ -8,14 +8,14 @@
 </head>
 <body>
     <div id="app">
+    <div class="drag" id="drag-area" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; -webkit-app-region: drag; z-index: 0;"></div>
         <!-- бар -->
         <div id="titlebar">
             <div class="titlebar-left">
-                <div class="titlebar-brand">
+                <div class="titlebar-brand" onclick="switchView('player')" style="cursor: pointer;">
                     <img src="images/icon.png" alt="SkyKwid" class="brand-icon">
                     <span class="brand-name">SkyKwid</span>
                 </div>
-                <div class="titlebar-tab active" data-view="player" data-icon="♫" onclick="switchView('player')">Плеер</div>
                 <div class="titlebar-tab" data-view="playlist" data-icon="&#8801;" onclick="switchView('playlist')">Плейлист</div>
             </div>
             <div class="titlebar-right">
@@ -58,21 +58,29 @@
         <!-- настройки -->
          <div class="content-page" id="settingsView" style="display: none;">
             <div class="setting-card">
-                <h2 class="setting-title">⚙️ Настройки</h2>
+                <h2 class="setting-title">Настройки</h2>
                 
                 <!-- тема -->
                 <div class="setting-row">
-                    <label class="setting-label">🎨 Тема</label>
-                    <select class="setting-select" id="themeSelect">
+                    <label class="setting-label">Тема</label>
+                    <select class="settings-select" id="themeSelect">
                         <option value="dark">Тёмная</option>
                         <option value="light">Светлая</option>
                         <option value="glass">Стеклянная</option>
                     </select>
                 </div>
                 
+                 <!-- фоны -->
+                <div class="settings-section">
+                    <div class="settings-header">
+                        <span class="settings-label">Фоны</span>
+                    </div>
+                    <div class="backgrounds-grid" id="backgroundsGrid"></div>
+                </div>
+
                 <!-- автовоспроизведение -->
                 <div class="setting-row">
-                    <label class="setting-label">▶️ Автовоспроизведение при запуске</label>
+                    <label class="setting-label">Автозагрузка</label>
                     <label class="switch">
                         <input type="checkbox" id="autoPlayCheck" checked>
                         <span class="slider"></span>

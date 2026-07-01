@@ -1,4 +1,13 @@
 /* глобал */
+.player,
+.playlist-card,
+.setting-card,
+.modal-box {
+    -webkit-app-region: no-drag;
+    position: relative;
+    z-index: 1;
+}
+
 html, body {
     margin: 0;
     padding: 0;
@@ -8,16 +17,87 @@ html, body {
     color: white;
 }
 
-body {
-    background: url('images/background.jpg') no-repeat center center fixed;
-    background-size: cover;
-}
-
 #app {
     display: flex;
     flex-direction: column;
     height: 100vh;
     background: rgba(0, 0, 0, 0.25);
+}
+
+/* фоны */
+.settings-section {
+    margin-top: 16px;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.backgrounds-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 4px;
+}
+
+.bg-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 6px;
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+    border: 2px solid transparent;
+}
+
+.bg-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.bg-card.active {
+    border-color: #e94560;
+}
+
+.bg-preview {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.bg-name {
+    font-size: 11px;
+    color: #aaa;
+    text-align: center;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bg-delete {
+    background: rgba(233, 69, 96, 0.2);
+    border: none;
+    color: #e94560;
+    padding: 2px 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+}
+
+.bg-delete:hover {
+    background: rgba(233, 69, 96, 0.4);
 }
 
 /* верхний бар */
@@ -354,14 +434,31 @@ body {
 }
 
 .settings-select {
-    padding: 6px 12px;
-    border-radius: 8px;
-    background: #1a1a2e;
+    padding: 6px 13px;
+    border-radius: 100px;
+    background: #3a3a5a;
     color: white;
     border: 1px solid #2a2a4a;
     font-size: 14px;
     cursor: pointer;
     outline: none;
+    transition: 0.2s;
+    min-width: 130px;
+}
+
+.settings-select:hover {
+    border-color: #e94560;
+}
+
+.settings-select:focus {
+    border-color: #e94560;
+    box-shadow: 0 0 0 2px rgba(233, 69, 96, 0.2);
+}
+
+.settings-select option {
+    background: #1a1a2e;
+    color: white;
+    padding: 8px;
 }
 
 .settings-status {
@@ -526,6 +623,64 @@ body {
     background: #ff6b8a;
 }
 
+/* переключатель */
+.switch {
+    position: relative;
+    display: inline-flex;
+    align-items: bottom;
+    width: 50px;
+    aspect-ratio: 2 / 1;
+    flex-shrink: 0;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    position: absolute;
+}
+
+.slider {
+    position: absolute;
+    /* cursor: pointer; */
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #2a2a4a;
+    transition: .3s;
+    border-radius: 34px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    width: 42%;
+    aspect-ratio: 1 / 1;
+    left: 8%;
+    top: 6%;
+    background: #6c6c8a;
+    transition: .3s;
+    border-radius: 50%;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+input:checked + .slider {
+    background: #e94560;
+}
+
+input:checked + .slider:before {
+    transform: translateX(100%);
+    background: white;
+}
+
+/* эффект при наведении */
+.switch:hover .slider {
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.15);
+}
+
 /* уведомления */
 .toast {
     display: none;
@@ -564,4 +719,28 @@ body {
     .player {
         padding: 20px 16px;
     }
+}
+
+/* запрет выделения */
+* {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+}
+
+/* работает в полях */
+input,
+textarea {
+    user-select: text !important;
+    -webkit-user-select: text !important;
+}
+
+.drag {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-app-region: drag;
+    z-index: 0;
 }

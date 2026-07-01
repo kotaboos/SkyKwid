@@ -27,6 +27,24 @@ function getSongs() {
     return songs;
 }
 
+// скагирование папки с фонами
+ipcMain.handle('get-backgrounds', () => {
+    const backgroundsPath = path.join(__dirname, 'images', 'backgrounds');
+    try {
+        const files = fs.readdirSync(backgroundsPath);
+        return files.filter(file => {
+            const ext = file.toLowerCase();
+            return ext.endsWith('.jpg') || ext.endsWith('.jpeg') || 
+                   ext.endsWith('.png') || ext.endsWith('.gif') || 
+                   ext.endsWith('.webp');
+        });
+    } catch (e) {
+        console.error('Папка backgrounds не найдена:', e);
+        return [];
+    }
+});
+
+// создание окна
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 450,
@@ -69,6 +87,20 @@ ipcMain.on('window-maximize', () => {
     }
 });
 ipcMain.on('window-close', () => mainWindow.close());
+
+// выбор фото для фона
+ipcMain.handle('select-image-dialog', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [
+            { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'] }
+        ]
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths;
+    }
+    return null;
+});
 
 // плейлисты
 const playlistsPath = path.join(__dirname, 'playlists.json');

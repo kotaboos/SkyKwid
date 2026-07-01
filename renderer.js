@@ -89,6 +89,103 @@ prevBtn.addEventListener('click', prevTrack);
 nextBtn.addEventListener('click', nextTrack);
 document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); togglePlay(); } });
 
+// тема и фон
+async function loadSettings() {
+    const settings = await ipcRenderer.invoke('load-settings');
+    if (settings) {
+        document.getElementById('themeSelect').value = settings.theme || 'dark';
+        document.getElementById('autoPlayCheck').checked = settings.autoPlay !== false;
+        applyTheme(settings.theme || 'dark');
+        
+        if (settings.background) {
+            document.body.style.backgroundImage = `url('${settings.background}')`;
+            document.body.style.backgroundSize = 'cover';
+            document.body.style.backgroundPosition = 'center';
+        }
+    }
+}
+
+// выбор фона
+let currentBackground = '';
+
+async function loadBackgrounds() {
+    const container = document.getElementById('backgroundsGrid');
+    if (!container) return;
+
+    const files = await ipcRenderer.invoke('get-backgrounds');
+    
+    container.innerHTML = '';
+    files.forEach(file => {
+        const path = `images/backgrounds/${file}`;
+        const card = document.createElement('div');
+        card.className = 'bg-card';
+        
+        const preview = document.createElement('div');
+        preview.className = 'bg-preview';
+        preview.style.backgroundImage = `url('${path}')`;
+        
+        const name = document.createElement('span');
+        name.className = 'bg-name';
+        name.textContent = file.replace(/\.[^.]+$/, '');
+        
+        card.appendChild(preview);
+        card.appendChild(name);
+
+        card.onclick = () => applyBackground(path);
+        
+        container.appendChild(card);
+    });
+}
+
+function applyBackground(path) {
+    document.body.style.backgroundImage = `url('${path}')`;
+    document.body.style.backgroundSize = 'cover';
+    document.body.style.backgroundPosition = 'center';
+    document.body.style.backgroundRepeat = 'no-repeat';
+    document.body.style.backgroundAttachment = 'fixed';
+    
+    currentBackground = path;
+    localStorage.setItem('currentBackground', path);
+
+    document.querySelectorAll('.bg-card').forEach(card => {
+        card.classList.remove('active');
+    });
+
+    document.querySelectorAll('.bg-card .bg-preview').forEach(el => {
+        if (el.style.backgroundImage.includes(path)) {
+            el.closest('.bg-card').classList.add('active');
+        }
+    });
+}
+
+// async function selectBackground() {
+//     const filePaths = await ipcRenderer.invoke('select-image-dialog');
+//     if (!filePaths || filePaths.length === 0) return;
+
+//     const imagePath = filePaths[0];
+    
+//     const settings = {
+//         theme: document.getElementById('themeSelect').value,
+//         autoPlay: document.getElementById('autoPlayCheck').checked,
+//         background: imagePath
+//     };
+//     ipcRenderer.send('save-settings', settings);
+
+//     document.body.style.backgroundImage = `url('${imagePath}')`;
+//     document.body.style.backgroundSize = 'cover';
+//     document.body.style.backgroundPosition = 'center';
+    
+//     showToast('Фон обновлён');
+// }
+
+loadBackgrounds();
+
+// применяем сохранённый фон
+const savedBg = localStorage.getItem('currentBackground');
+if (savedBg) {
+    applyBackground(savedBg);
+}
+
 // плейлисты из папок
 let playlists = [];
 
