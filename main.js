@@ -27,6 +27,20 @@ function getSongs() {
     return songs;
 }
 
+// копирование файла
+ipcMain.handle('copy-file', async (event, source, dest) => {
+    try {
+        const destDir = path.dirname(dest);
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+        }
+        fs.copyFileSync(source, dest);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
 // скагирование папки с фонами
 ipcMain.handle('get-backgrounds', () => {
     const backgroundsPath = path.join(__dirname, 'images', 'backgrounds');
@@ -144,6 +158,15 @@ function scanFolderForSongs(folderPath) {
     }
     return songs;
 }
+
+ipcMain.handle('delete-background', async (event, filePath) => {
+    try {
+        fs.unlinkSync(filePath);
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
 
 ipcMain.handle('load-playlists', () => loadPlaylistsFile());
 ipcMain.handle('save-playlists', (event, playlists) => savePlaylistsFile(playlists));

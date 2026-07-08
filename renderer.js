@@ -1,18 +1,9 @@
 const { ipcRenderer } = require('electron');
 let playlist = [], currentIndex = 0, isPlaying = false;
 const audio = new Audio();
+const path = require('path');
 
-ipcRenderer.invoke('get-songs').then(songs => {
-    playlist = songs;
-    if (playlist.length > 0) {
-        renderPlaylist();
-        loadTrack(0);
-        statusEl.textContent = 'Готов к воспроизведению';
-    } else {
-        statusEl.textContent = '❌ Нет MP3 в папке music';
-    }
-});
-
+// Элементы DOM
 const playBtn = document.getElementById('playBtn');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
@@ -25,6 +16,17 @@ const songTitleEl = document.getElementById('songTitle');
 const artistNameEl = document.getElementById('artistName');
 const statusEl = document.getElementById('status');
 const playlistContainer = document.getElementById('playlistContainer');
+
+ipcRenderer.invoke('get-songs').then(songs => {
+    playlist = songs;
+    if (playlist.length > 0) {
+        renderPlaylist();
+        loadTrack(0);
+        statusEl.textContent = 'Готов к воспроизведению';
+    } else {
+        statusEl.textContent = '❌ Нет MP3 в папке music';
+    }
+});
 
 function loadTrack(index) {
     const track = playlist[index];
@@ -57,6 +59,7 @@ function prevTrack() { if (playlist.length === 0) return; currentIndex = (curren
 function nextTrack() { if (playlist.length === 0) return; currentIndex = (currentIndex + 1) % playlist.length; loadTrack(currentIndex); if (isPlaying) audio.play(); }
 
 function renderPlaylist() {
+    if (!playlistContainer) return;
     playlistContainer.innerHTML = '';
     playlist.forEach((track, index) => {
         const div = document.createElement('div');
@@ -89,41 +92,61 @@ prevBtn.addEventListener('click', prevTrack);
 nextBtn.addEventListener('click', nextTrack);
 document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); togglePlay(); } });
 
-// тема и фон
-async function loadSettings() {
-    const settings = await ipcRenderer.invoke('load-settings');
-    if (settings) {
-        document.getElementById('themeSelect').value = settings.theme || 'dark';
-        document.getElementById('autoPlayCheck').checked = settings.autoPlay !== false;
-        applyTheme(settings.theme || 'dark');
-        
-        if (settings.background) {
-            document.body.style.backgroundImage = `url('${settings.background}')`;
-            document.body.style.backgroundSize = 'cover';
-            document.body.style.backgroundPosition = 'center';
+async function deleteBackground(file) {
+    const filePath = `images/backgrounds/${file}`;
+    try {
+        const result = await ipcRenderer.invoke('delete-background', filePath);
+        if (result.success) {
+            showToast(`🗑 Фон удалён: ${file}`);
+            loadBackgrounds();
+
+            const currentBg = localStorage.getItem('currentBackground');
+            if (currentBg === filePath) {
+                localStorage.removeItem('currentBackground');
+                document.body.style.backgroundImage = '';
+                showToast('Фон сброшен', 2000);
+            }
+        } else {
+            showToast(`Ошибка: ${result.error}`);
         }
+    } catch (e) {
+        showToast(`Ошибка удаления: ${e.message}`);
     }
 }
-
-// выбор фона
-let currentBackground = '';
 
 async function loadBackgrounds() {
     const container = document.getElementById('backgroundsGrid');
     if (!container) return;
 
     const files = await ipcRenderer.invoke('get-backgrounds');
-    
+
     container.innerHTML = '';
     files.forEach(file => {
         const path = `images/backgrounds/${file}`;
         const card = document.createElement('div');
         card.className = 'bg-card';
+        card.dataset.file = file;
         
+        const wrapper = document.createElement('div');
+        wrapper.className = 'bg-preview-wrapper';
+
         const preview = document.createElement('div');
         preview.className = 'bg-preview';
         preview.style.backgroundImage = `url('${path}')`;
-        
+        preview.style.backgroundSize = 'cover';
+        preview.style.backgroundPosition = 'center';
+
+        const delBtn = document.createElement('button');
+        delBtn.className = 'bg-delete';
+        delBtn.textContent = '✕';
+        delBtn.onclick = (e) => {
+            e.stopPropagation();
+            deleteBackground(file);
+        };
+
+        wrapper.appendChild(preview);
+        wrapper.appendChild(delBtn);
+
         const name = document.createElement('span');
         name.className = 'bg-name';
         name.textContent = file.replace(/\.[^.]+$/, '');
@@ -144,7 +167,6 @@ function applyBackground(path) {
     document.body.style.backgroundRepeat = 'no-repeat';
     document.body.style.backgroundAttachment = 'fixed';
     
-    currentBackground = path;
     localStorage.setItem('currentBackground', path);
 
     document.querySelectorAll('.bg-card').forEach(card => {
@@ -158,32 +180,30 @@ function applyBackground(path) {
     });
 }
 
-// async function selectBackground() {
-//     const filePaths = await ipcRenderer.invoke('select-image-dialog');
-//     if (!filePaths || filePaths.length === 0) return;
-
-//     const imagePath = filePaths[0];
-    
-//     const settings = {
-//         theme: document.getElementById('themeSelect').value,
-//         autoPlay: document.getElementById('autoPlayCheck').checked,
-//         background: imagePath
-//     };
-//     ipcRenderer.send('save-settings', settings);
-
-//     document.body.style.backgroundImage = `url('${imagePath}')`;
-//     document.body.style.backgroundSize = 'cover';
-//     document.body.style.backgroundPosition = 'center';
-    
-//     showToast('Фон обновлён');
-// }
-
 loadBackgrounds();
 
 // применяем сохранённый фон
 const savedBg = localStorage.getItem('currentBackground');
 if (savedBg) {
     applyBackground(savedBg);
+}
+
+// добавление фона
+async function addBackground() {
+    const filePaths = await ipcRenderer.invoke('select-image-dialog');
+    if (!filePaths || filePaths.length === 0) return;
+    
+    const sourcePath = filePaths[0];
+    const fileName = sourcePath.split('\\').pop();
+    const destPath = `images/backgrounds/${fileName}`;
+    
+    const result = await ipcRenderer.invoke('copy-file', sourcePath, destPath);
+    if (result.success) {
+        showToast('Фон добавлен');
+        loadBackgrounds();
+    } else {
+        showToast('❌ Ошибка: ' + result.error);
+    }
 }
 
 // плейлисты из папок
@@ -252,7 +272,7 @@ function renderPlaylistsList() {
     const container = document.getElementById('playlistsList');
     if (!container) return;
     if (playlists.length === 0) {
-        container.innerHTML = '<p style="color: #ffffff; text-align: center">Пока нет плейлистов. Создайте первый!</p>';
+        container.innerHTML = '<p class="empty-playlist">Пока нет плейлистов. Создайте первый!</p>';
         return;
     }
     container.innerHTML = '';
@@ -287,11 +307,6 @@ function renderPlaylistsList() {
             };
             btnGroup.appendChild(delBtn);
         }
-
-        // const btn = document.createElement('button');
-        // btn.textContent = '▶ Загрузить';
-        // btn.style.cssText = 'background: #e94560; border: none; color: white; padding: 4px 12px; border-radius: 8px; cursor: pointer; font-size: 13px;';
-        // btn.onclick = (e) => { e.stopPropagation(); loadPlaylistById(pl.id); };
 
         div.appendChild(info);
         div.appendChild(btnGroup);
@@ -379,31 +394,11 @@ function switchView(view) {
     document.querySelectorAll('.content-page').forEach(page => page.style.display = 'none');
 
     if (view === 'player') {
-        // показываем плеер
         playerContent.style.display = 'flex';
         playlistContent.style.display = 'none';
-
-        // убираем и возвращаем класс
-        const player = document.querySelector('.player');
-        if (player) {
-            player.classList.remove('player');
-            void player.offsetHeight;
-            player.classList.add('player');
-        }
-
-        // доп пересчёт через 100 мс
-        setTimeout(() => {
-            if (playerContent) {
-                playerContent.style.display = 'none';
-                void playerContent.offsetHeight;
-                playerContent.style.display = 'flex';
-            }
-        }, 100);
-
     } else if (view === 'playlist') {
         playerContent.style.display = 'none';
         playlistContent.style.display = 'flex';
-        renderPlaylistsList();
     } else if (view === 'settings') {
         playerContent.style.display = 'none';
         playlistContent.style.display = 'none';
@@ -413,15 +408,12 @@ function switchView(view) {
 }
 
 function windowMinimize() {
-    const { ipcRenderer } = require('electron');
     ipcRenderer.send('window-minimize');
 }
 function windowMaximize() {
-    const { ipcRenderer } = require('electron');
     ipcRenderer.send('window-maximize');
 }
 function windowClose() {
-    const { ipcRenderer } = require('electron');
     ipcRenderer.send('window-close');
 }
 

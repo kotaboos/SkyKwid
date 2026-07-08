@@ -1,6 +1,6 @@
 {
   "name": "skykwid-player",
-  "version": "1.2.9",
+  "version": "1.3.2",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
