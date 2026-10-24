@@ -41,7 +41,7 @@ ipcMain.handle('copy-file', async (event, source, dest) => {
     }
 });
 
-// скагирование папки с фонами
+// сканирование папки с фонами
 ipcMain.handle('get-backgrounds', () => {
     const backgroundsPath = path.join(__dirname, 'images', 'backgrounds');
     try {
@@ -65,8 +65,11 @@ function createWindow() {
         height: 700,
         minWidth: 400,
         minHeight: 550,
-        maxWidth: 600,
-        maxHeight: 800,
+        maxWidth: 700,
+        maxHeight: 950,
+        maximizable: false,
+        transparent: true,
+        backgroundColor: '#00000000',
         frame: false,
         titleBarStyle: 'hidden',
         title: 'SkyKwid',
