@@ -4,18 +4,28 @@
     <meta charset="UTF-8">
     <title>SkyKwid</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
 <body>
     <div id="app">
-        <!-- бар -->
+        <div class="drag" id="drag-area"></div>
+        
+        <!-- шапка -->
         <div id="titlebar">
             <div class="titlebar-left">
-                <div class="titlebar-tab active" data-view="player" onclick="switchView('player')">🎵 Плеер</div>
-                <div class="titlebar-tab" data-view="playlist" onclick="switchView('playlist')">📋 Плейлист</div>
+                <div class="titlebar-brand" onclick="switchView('player')" style="cursor: pointer;">
+                    <img src="images/icon.png" alt="SkyKwid" class="brand-icon">
+                    <span class="brand-name">SkyKwid</span>
+                </div>
+                <div class="titlebar-tab" data-view="playlist" onclick="switchView('playlist')">
+                    <i class="fa-solid fa-list-ul"></i>Плейлист
+                </div>
             </div>
             <div class="titlebar-right">
+                <div class="titlebar-tab" data-view="settings" onclick="switchView('settings')">
+                    <i class="fa-solid fa-gear"></i>
+                </div>
                 <div class="window-btn" onclick="windowMinimize()">─</div>
-                <div class="window-btn" onclick="windowMaximize()">☐</div>
                 <div class="window-btn close-btn" onclick="windowClose()">✕</div>
             </div>
         </div>
@@ -23,15 +33,14 @@
         <!-- плеер -->
         <div class="player-content">
             <div class="player">
-                <h1>🎵 SkyKwid</h1>
                 <div class="title" id="songTitle">Нет трека</div>
                 <div class="artist" id="artistName">—</div>
                 <div class="progress-container" id="progressContainer"><div class="progress" id="progress"></div></div>
                 <div class="time"><span id="currentTime">0:00</span><span id="totalTime">0:00</span></div>
                 <div class="controls">
-                    <button id="prevBtn">⏮</button>
-                    <button id="playBtn">▶</button>
-                    <button id="nextBtn">⏭</button>
+                    <button id="prevBtn"><i class="fa-solid fa-backward-step"></i></button>
+                    <button id="playBtn"><i class="fa-solid fa-play"></i></button>
+                    <button id="nextBtn"><i class="fa-solid fa-forward-step"></i></button>
                 </div>
                 <div class="volume"><span>🔊</span><input type="range" id="volumeSlider" min="0" max="100" value="80"></div>
                 <div class="playlist" id="playlistContainer"></div>
@@ -41,163 +50,80 @@
 
         <!-- плейлист -->
         <div class="playlist-content" style="display: none;">
-            <h2 style="color: white; padding: 20px; text-align: center;">Тут будет большой список песен</h2>
+            <div class="playlist-card">
+                <div class="playlist-list" id="playlistsList">
+                    <p class="empty-playlist">Пока нет плейлистов. Создайте первый!</p>
+                </div>
+                <button class="btn-primary btn-full" onclick="createPlaylist()">Создать плейлист из папки</button>
+                <button class="btn-secondary btn-full" onclick="addFilesToPlaylist()">Добавить файлы в плейлист</button>
+            </div>
+        </div>
+
+        <!-- настройки -->
+        <div class="content-page" id="settingsView" style="display: none;">
+            <div class="setting-card">
+                <h2 class="setting-title">Настройки</h2>
+                
+                <div class="setting-row">
+                    <label class="setting-label">Тема</label>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <select class="settings-select" id="themeSelect">
+                            <option value="glass">Стеклянная</option>
+                            <option value="dark">Тёмная</option>
+                            <option value="light">Светлая</option>
+                        </select>
+                        <input type="color" id="accentColorInput" value="#6c7086" title="Выбрать цвет акцента">
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <div class="settings-header">
+                        <span class="settings-label">Фоны</span>
+                        <button class="btn-secondary" onclick="addBackground()" style="padding: 4px 12px; font-size: 13px;">Добавить</button>
+                    </div>
+                    <div class="backgrounds-grid" id="backgroundsGrid"></div>
+                </div>
+
+                <div class="setting-row">
+                    <label class="setting-label">Автозагрузка</label>
+                    <label class="switch">
+                        <input type="checkbox" id="autoPlayCheck" checked>
+                        <span class="slider"></span>
+                    </label>
+                </div>
+
+                <button class="btn-primary btn-full" onclick="saveSettings()">Сохранить настройки</button>
+                <div class="settings-status" id="settingsStatus"></div>
+            </div>
+        </div>
+
+        <!-- модальные окна и тосты -->
+        <div class="modal-overlay" id="modal" style="display: none;">
+            <div class="modal-box">
+                <h3 class="modal-title">Введите название плейлиста</h3>
+                <input class="modal-input" type="text" id="modalInput" placeholder="Название...">
+                <div class="modal-actions">
+                    <button class="btn-cancel" onclick="closeModal()">Отмена</button>
+                    <button class="btn-confirm" id="modalConfirmBtn">Создать</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="toast" id="toast" style="display: none;">
+            <span id="toastMessage"></span>
+        </div>
+
+        <div class="modal-overlay" id="confirmModal" style="display: none;">
+            <div class="modal-box">
+                <p class="modal-confirm-text" id="confirmMessage">Вы уверены?</p>
+                <div class="modal-actions" style="justify-content: center;">
+                    <button class="btn-cancel" onclick="confirmResponse(false)">Отмена</button>
+                    <button class="btn-danger" onclick="confirmResponse(true)">Удалить</button>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <script>
-        const { ipcRenderer } = require('electron');
-        let playlist = [], currentIndex = 0, isPlaying = false;
-        const audio = new Audio();
 
-        ipcRenderer.invoke('get-songs').then(songs => {
-            playlist = songs;
-            if (playlist.length > 0) {
-                renderPlaylist();
-                loadTrack(0);
-                statusEl.textContent = 'Готов к воспроизведению';
-            } else {
-                statusEl.textContent = '❌ Нет MP3 в папке music';
-            }
-        });
-
-        const playBtn = document.getElementById('playBtn');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const progress = document.getElementById('progress');
-        const progressContainer = document.getElementById('progressContainer');
-        const currentTimeEl = document.getElementById('currentTime');
-        const totalTimeEl = document.getElementById('totalTime');
-        const volumeSlider = document.getElementById('volumeSlider');
-        const songTitleEl = document.getElementById('songTitle');
-        const artistNameEl = document.getElementById('artistName');
-        const statusEl = document.getElementById('status');
-        const playlistContainer = document.getElementById('playlistContainer');
-
-        function loadTrack(index) {
-            const track = playlist[index];
-            if (!track) return;
-            audio.src = track.file;
-            songTitleEl.textContent = track.title;
-            artistNameEl.textContent = track.artist;
-            progress.style.width = '0%';
-            currentTimeEl.textContent = '0:00';
-            totalTimeEl.textContent = '0:00';
-            renderPlaylist();
-        }
-
-        function togglePlay() {
-            if (playlist.length === 0) return;
-            if (audio.src === '') loadTrack(currentIndex);
-            if (isPlaying) {
-                audio.pause();
-                playBtn.textContent = '▶';
-                statusEl.textContent = '⏸ На паузе';
-            } else {
-                audio.play().catch(() => statusEl.textContent = '❌ Ошибка файла');
-                playBtn.textContent = '⏸';
-                statusEl.textContent = '▶ ' + playlist[currentIndex].title;
-            }
-            isPlaying = !isPlaying;
-        }
-
-        function prevTrack() { if (playlist.length === 0) return; currentIndex = (currentIndex - 1 + playlist.length) % playlist.length; loadTrack(currentIndex); if (isPlaying) audio.play(); }
-        function nextTrack() { if (playlist.length === 0) return; currentIndex = (currentIndex + 1) % playlist.length; loadTrack(currentIndex); if (isPlaying) audio.play(); }
-
-        function renderPlaylist() {
-            playlistContainer.innerHTML = '';
-            playlist.forEach((track, index) => {
-                const div = document.createElement('div');
-                div.className = 'playlist-item' + (index === currentIndex ? ' active' : '');
-                div.textContent = track.title + ' — ' + track.artist;
-                div.onclick = () => { currentIndex = index; loadTrack(currentIndex); if (isPlaying) audio.play(); };
-                playlistContainer.appendChild(div);
-            });
-        }
-
-        audio.addEventListener('timeupdate', () => {
-            if (audio.duration) {
-                progress.style.width = (audio.currentTime / audio.duration * 100) + '%';
-                let m = Math.floor(audio.currentTime / 60), s = Math.floor(audio.currentTime % 60);
-                currentTimeEl.textContent = m + ':' + (s < 10 ? '0' : '') + s;
-                let tm = Math.floor(audio.duration / 60), ts = Math.floor(audio.duration % 60);
-                totalTimeEl.textContent = tm + ':' + (ts < 10 ? '0' : '') + ts;
-            }
-        });
-        audio.addEventListener('ended', nextTrack);
-        progressContainer.addEventListener('click', (e) => {
-            const rect = progressContainer.getBoundingClientRect();
-            const percent = (e.clientX - rect.left) / rect.width;
-            if (audio.duration) audio.currentTime = percent * audio.duration;
-        });
-        volumeSlider.addEventListener('input', () => audio.volume = volumeSlider.value / 100);
-
-        playBtn.addEventListener('click', togglePlay);
-        prevBtn.addEventListener('click', prevTrack);
-        nextBtn.addEventListener('click', nextTrack);
-        document.addEventListener('keydown', (e) => { if (e.code === 'Space') { e.preventDefault(); togglePlay(); } });
-
-        // переключение вкладок
-        function switchView(view) {
-            document.querySelectorAll('.titlebar-tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            const activeTab = document.querySelector(`.titlebar-tab[data-view="${view}"]`);
-            if (activeTab) activeTab.classList.add('active');
-
-            const playerContent = document.querySelector('.player-content');
-            const playlistContent = document.querySelector('.playlist-content');
-
-            if (view === 'player') {
-                // показываем плеер
-                playerContent.style.display = 'flex';
-                playlistContent.style.display = 'none';
-
-                // убираем и возвращаем класс
-                const player = document.querySelector('.player');
-                if (player) {
-                    player.classList.remove('player');
-                    void player.offsetHeight;
-                    player.classList.add('player');
-                }
-
-                // доп пересчёт через 100 мс
-                setTimeout(() => {
-                    if (playerContent) {
-                        playerContent.style.display = 'none';
-                        void playerContent.offsetHeight;
-                        playerContent.style.display = 'flex';
-                    }
-                }, 100);
-
-            } else if (view === 'playlist') {
-                playerContent.style.display = 'none';
-                playlistContent.style.display = 'flex';
-            }
-        }
-
-        function windowMinimize() {
-            const { ipcRenderer } = require('electron');
-            ipcRenderer.send('window-minimize');
-        }
-        function windowMaximize() {
-            const { ipcRenderer } = require('electron');
-            ipcRenderer.send('window-maximize');
-        }
-        function windowClose() {
-            const { ipcRenderer } = require('electron');
-            ipcRenderer.send('window-close');
-        }
-
-        window.addEventListener('resize', () => {
-            const player = document.querySelector('.player');
-            if (player && document.querySelector('.player-content').style.display !== 'none') {
-                player.style.transform = 'scale(0.99)';
-                requestAnimationFrame(() => {
-                    player.style.transform = 'scale(1)';
-                });
-            }
-        });
-    </script>
+    <script src="renderer.js"></script>
 </body>
 </html>

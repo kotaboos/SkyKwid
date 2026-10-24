@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const fs = require('fs');
 const path = require('path');
 
@@ -27,22 +27,60 @@ function getSongs() {
     return songs;
 }
 
+// копирование файла
+ipcMain.handle('copy-file', async (event, source, dest) => {
+    try {
+        const destDir = path.dirname(dest);
+        if (!fs.existsSync(destDir)) {
+            fs.mkdirSync(destDir, { recursive: true });
+        }
+        fs.copyFileSync(source, dest);
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
+// сканирование папки с фонами
+ipcMain.handle('get-backgrounds', () => {
+    const backgroundsPath = path.join(__dirname, 'images', 'backgrounds');
+    try {
+        const files = fs.readdirSync(backgroundsPath);
+        return files.filter(file => {
+            const ext = file.toLowerCase();
+            return ext.endsWith('.jpg') || ext.endsWith('.jpeg') || 
+                   ext.endsWith('.png') || ext.endsWith('.gif') || 
+                   ext.endsWith('.webp');
+        });
+    } catch (e) {
+        console.error('Папка backgrounds не найдена:', e);
+        return [];
+    }
+});
+
+// создание окна
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 450,
         height: 700,
-        minWidth:380,
-        minHeight:550,
+        minWidth: 400,
+        minHeight: 550,
+        maxWidth: 700,
+        maxHeight: 950,
+        maximizable: false,
+        transparent: true,
+        backgroundColor: '#00000000',
         frame: false,
         titleBarStyle: 'hidden',
         title: 'SkyKwid',
-        icon: path.join(__dirname, 'images', 'icon.jpg'),
+        icon: path.join(__dirname, 'images', 'icon.png'),
         webPreferences: {
             nodeIntegration: true,
             contextIsolation: false
         }
     });
     mainWindow.setMenuBarVisibility(false);
+    // mainWindow.webContents.openDevTools();
     mainWindow.loadFile('index.html');
 }
 
@@ -66,3 +104,94 @@ ipcMain.on('window-maximize', () => {
     }
 });
 ipcMain.on('window-close', () => mainWindow.close());
+
+// выбор фото для фона
+ipcMain.handle('select-image-dialog', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile'],
+        filters: [
+            { name: 'Images', extensions: ['jpg', 'jpeg', 'png', 'gif', 'webp'] }
+        ]
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths;
+    }
+    return null;
+});
+
+// плейлисты
+const playlistsPath = path.join(__dirname, 'playlists.json');
+
+function loadPlaylistsFile() {
+    try {
+        if (fs.existsSync(playlistsPath)) {
+            const data = fs.readFileSync(playlistsPath, 'utf8');
+            return JSON.parse(data);
+        }
+    } catch (e) {}
+    return [];
+}
+
+function savePlaylistsFile(playlists) {
+    try {
+        fs.writeFileSync(playlistsPath, JSON.stringify(playlists, null, 2));
+    } catch (e) {
+        console.error('Ошибка сохранения плейлистов:', e);
+    }
+}
+
+function scanFolderForSongs(folderPath) {
+    const songs = [];
+    try {
+        const files = fs.readdirSync(folderPath);
+        files.forEach(file => {
+            if (file.toLowerCase().endsWith('.mp3')) {
+                const name = file.replace(/\.mp3$/i, '');
+                let artist = 'Неизвестен', title = name;
+                if (name.includes(' - ')) {
+                    const parts = name.split(' - ');
+                    artist = parts[0];
+                    title = parts.slice(1).join(' - ');
+                }
+                songs.push({ title: title, artist: artist, file: path.join(folderPath, file) });
+            }
+        });
+    } catch (e) {
+        console.error('Ошибка сканирования папки:', e);
+    }
+    return songs;
+}
+
+ipcMain.handle('delete-background', async (event, filePath) => {
+    try {
+        fs.unlinkSync(filePath);
+        return { success: true };
+    } catch (e) {
+        return { success: false, error: e.message };
+    }
+});
+
+ipcMain.handle('load-playlists', () => loadPlaylistsFile());
+ipcMain.handle('save-playlists', (event, playlists) => savePlaylistsFile(playlists));
+ipcMain.handle('scan-folder', (event, folderPath) => scanFolderForSongs(folderPath));
+ipcMain.handle('select-folder-dialog', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory']
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths[0];
+    }
+    return null;
+});
+
+// выбор файлов - плейлист
+ipcMain.handle('select-files-dialog', async () => {
+    const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openFile', 'multiSelections'],
+        filters: [{ name: 'MP3', extensions: ['mp3'] }]
+    });
+    if (!result.canceled && result.filePaths.length > 0) {
+        return result.filePaths;
+    }
+    return null;
+});
